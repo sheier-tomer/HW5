@@ -35,19 +35,14 @@ ScrabbleTiles["Z"] = { "value": 10, "original": 1, "remaining": 1 };
 ScrabbleTiles["["] = { "value": 0, "original": 2, "remaining": 2 };
 
 
-var tileSet = [];//array for determining if there is a tile on the square
-var playerRack = [];//holds players tiles
+var tileSet = [];//for if there is a tile on the square
+var playerRack = [];//players tiles
 var score = 0;
-var ScrabbleValues = Object.keys(ScrabbleTiles).length;//in order to work with this data structure i utilized the object.keys function
-//this allowed me to find the length of just the vales of each tile
+var ScrabbleValues = Object.keys(ScrabbleTiles).length;
 
 //first function is to get a random tile, set the rack, and fill the rack up with the tiles
 function Rack() {
-
-    var tileCount = 1;//corresponds with the id's so we know which position is what. 1 is starting position
-
-
-    //broke the link down into multiple variables
+    var tileCount = 1;
     var src;
     var id;
     var title;
@@ -58,24 +53,22 @@ function Rack() {
 
     $('#rack div').empty();
 
-    //starting with the first tile in the first postion
+    //loop through the rack and add tiles to it
     for (var i = 0; tileCount <= 7; i++) {
 
         var randTile = Math.floor((Math.random() * 27));//get a random tile
 
-        //this condition checks if the number of remaining tiles is not empty and if there are tiles left in the bag
-        //if there are not empty and their is tiles remaining, add the corresponding random tile, decrement the remaining ScrabbleValue
-        //then add the image corresponding with the random tile
+        //This condition verifies whether there are still tiles remaining and the tile bag is not empty. 
+        //If there are tiles left and the bag is not empty, it adds a randomly selected tile, 
+        //reduces the remaining ScrabbleValue, and includes the image associated with the chosen tile.
         if (ScrabbleTiles[String.fromCharCode(65 + randTile)]["remaining"] !== 0 && remainingTiles()) {
             
             playerRack[tileCount] = { "letter": String.fromCharCode(65 + randTile), "value": ScrabbleTiles[String.fromCharCode(65 + randTile)]["value"] };
 
-            ScrabbleTiles[String.fromCharCode(65 + randTile)]["remaining"]--;//decrement
+            ScrabbleTiles[String.fromCharCode(65 + randTile)]["remaining"]--;//reduce the remaining tiles
 
-
-            //variables that hold the various part of the image link
-            id = "tile" + tileCount;//tile position
-            title = playerRack[tileCount]["letter"];//letter of tile
+            id = "tile" + tileCount;
+            title = playerRack[tileCount]["letter"];
             src = "./graphics_data/Scrabble_tiles/Scrabble_Tile_" + playerRack[tileCount]["letter"] + ".jpg";//src link
 
             $('#playerRack').prepend($('<img>', {
@@ -83,13 +76,13 @@ function Rack() {
                 src: src,
                 class: tileClass,
                 title: title
-            }));//add it to the rack with appropriate values
+            }));//add the tile to the rack
 
 
-            tileCount++;//increase how many tiles on rack
+            tileCount++;//increment the tile count
         }
 
-        //if there are no tiles left disable the button and make a message
+        //This condition verifies whether there are still tiles remaining and the tile bag is not empty.
         if (remainingTiles() == false) {
 
             //disable new tiles button upon no tiles left
@@ -98,20 +91,20 @@ function Rack() {
             return;
         }
 
-        //make the board snappable
+        //make the tiles draggable
         $("#" + id).draggable({
             snap: ".boardTile",
             snapMode: "inner"
         });
     }
 
-    update();
+    updateScore();
 }
 
 
 
 
-//functions to add drag and drop functionality.
+//function for drag and drop functionality.
 function tileOnBoard(event, ui) {
     const tileId = $(this).attr("id");
     const tileTitle = $(this).attr("title");
@@ -131,12 +124,12 @@ function tileOnBoard(event, ui) {
         }
 
         tileSet[tileId] = true;
-        update();
+        updateScore();
     }
 }
 
 
-//same thing here, except we subtract the value when the tile is removed,
+//subtract the value when the tile is removed,
 function tileOffBoard(event, ui) {
     const tileId = $(this).attr("id");
     const tileTitle = $(this).attr("title");
@@ -146,7 +139,7 @@ function tileOffBoard(event, ui) {
         const charCode = ui.draggable.attr("title").charCodeAt(0);
         const tileValue = ScrabbleTiles[String.fromCharCode(charCode)]["value"];
 
-        // Perform score deduction based on the title attribute
+        // Perform score calculation based on the title attribute
         if (tileTitle === 'double') {
             score -= 2 * tileValue;
         } else if (tileTitle === 'triple') {
@@ -156,7 +149,7 @@ function tileOffBoard(event, ui) {
         }
 
         tileSet[tileId] = false;
-        update();
+        updateScore();
     }
 }
 
@@ -172,7 +165,7 @@ function reset() {
     }
 
     score = 0;
-    update();
+    updateScore();
     Rack();
 }
 
@@ -181,7 +174,7 @@ function reset() {
 
 
 //update the score
-function update() {
+function updateScore() {
 
     var curTile;
 
@@ -192,7 +185,7 @@ function update() {
 
         curTile = String.fromCharCode(65 + j);
 
-        if (curTile == "[") {// have to change name of the [ tile so we can use it with jquery
+        if (curTile == "[") {
             curTile = "Blank";
         }
 
@@ -205,7 +198,7 @@ function update() {
 
 function remainingTiles() {
 
-    var tileSet = false;//is there a set tile
+    var tileSet = false;
     var count = 0;
 
     while (count < 27) {
@@ -214,10 +207,10 @@ function remainingTiles() {
         if (ScrabbleTiles[String.fromCharCode(65 + count)]["remaining"] !== 0) {
             tileSet = true;//if the tiles remaining is not 0, there are tiles left
         }
-        count++;//loop through all valuees
+        count++;//increment the count
     }
 
-    return tileSet;//return to be used in conditional statements
+    return tileSet;
 
 }
 
